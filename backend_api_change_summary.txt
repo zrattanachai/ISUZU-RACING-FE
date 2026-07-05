@@ -1,0 +1,85 @@
+Backend API Change Summary (Position-Based Compare)
+Date: 2026-04-28
+Owner: Frontend integration request
+
+Purpose
+- Move Compare mode from time-axis to position/distance-based comparison for race operations.
+- Keep backward compatibility with existing payload fields.
+
+1) WebSocket Contract Changes (AsyncAPI)
+Files:
+- ISUZU-MOCK/asyncapi.yaml
+- ISUZU-RACING-FE/asyncapi.yaml
+
+A. vehicle.status (added optional fields)
+- positionNumber: integer (authoritative numeric rank)
+- deltaToAheadMeters: number (distance to immediate car ahead)
+- deltaToLeaderMeters: number (distance to race leader)
+
+B. vehicle.location (added optional fields)
+- progressContinuous: number (lap + lapProgress)
+- trackLengthMeters: number (circuit length for distance conversion)
+
+C. vehicle.telemetry (added optional field)
+- distanceMeters: number (backend-provided cumulative race distance in meters)
+- Intended use: frontend compare chart x-axis in distance mode should consume this backend value (not client-side integrated distance)
+
+Notes:
+- Existing fields remain unchanged (position, lap, lapProgress, etc.).
+- This is additive and backward compatible.
+
+2) REST Contract Changes (OpenAPI)
+Files:
+- ISUZU-MOCK/openapi.yaml
+- ISUZU-RACING-FE/openapi.yaml
+
+Schema updated: EngineeringGapRival
+Existing fields kept:
+- number: string
+- name: string
+- gap: number (legacy seconds)
+- isPos: boolean (legacy sign)
+
+Added fields (position-based compare):
+- gapMeters: number
+- deltaPosition: integer
+- relation: enum(AHEAD, BEHIND)
+
+Notes:
+- Existing clients can continue using gap/isPos.
+- New clients can switch to gapMeters/deltaPosition/relation.
+- No additional REST schema changes were introduced in this latest round.
+
+3) Mock Backend Runtime Changes
+File:
+- ISUZU-MOCK/src/data.ts
+
+What changed:
+- Added fleet-authoritative ranking snapshot logic from continuous progress.
+- buildTelemetryWs now emits:
+  - distanceMeters
+- buildLocation now emits:
+  - progressContinuous
+  - trackLengthMeters
+- buildStatus now emits:
+  - positionNumber
+  - deltaToAheadMeters
+  - deltaToLeaderMeters
+  - position string derived from positionNumber
+
+4) No New Route Required
+- No new REST path was introduced.
+- Existing proxy routes still used:
+  - /engineering/cars/{carId}/snapshot
+  - /race-control/cars/{carId}/snapshot
+
+5) Backend Implementation Request (Production)
+Required on real backend:
+- Populate new fields in vehicle.telemetry, vehicle.status, and vehicle.location streams.
+- Return EngineeringGapRival with position-based fields (gapMeters, deltaPosition, relation).
+- Keep legacy fields (gap, isPos) during migration window.
+
+6) Acceptance Criteria
+- Compare mode can operate without time-axis dependency.
+- Distance and position deltas are stable during yellow/red events.
+- Payload remains backward compatible for older FE builds.
