@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+/* Base Colors (Layout & State) */
+:root {
+  --background: #f8fafc;
+  --foreground: #0a0a0a;
+  --surface: rgba(255, 255, 255, 0.8);
+
+  --secondary: #262626;
+  --success: #00c853;
+  --warning: #eab308;
+  --danger: #ff1744;
+  --info: #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #ededed;
+    --surface: rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Default / Blue Theme (Matches logo) */
+
+:root,
+:root[data-theme='red'],
+:root[data-theme='blue'] {
+  --primary: var(--user-primary-color, #ff3333);
+  --accent: var(--user-accent-color, #ff3333);
+  --accent-glow: var(
+    --user-accent-glow,
+    color-mix(in srgb, #ff3333 40%, transparent)
+  );
+  --brand-gradient-end: var(--user-brand-gradient-end, #2a0505);
+}
+
+/* Reset helpers (optional, for JS to clear user overrides) */
+:root {
+  /* To reset, remove these variables from :root */
+  /* --user-primary-color: unset; */
+  /* --user-accent-color: unset; */
+  /* --user-accent-glow: unset; */
+  /* --user-brand-gradient-end: unset; */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-surface: var(--surface);
+  --color-brand-gradient-end: var(--brand-gradient-end);
+
+  --color-accent-glow: var(--accent-glow);
+
+  --color-surface-deep: #050505;
+  --color-surface-panel: rgba(255, 255, 255, 0.03);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow: hidden; /* App-like feel */
+}
+
+button:not(:disabled),
+a[href],
+select:not(:disabled),
+label:has(input:not(:disabled)),
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+/* Custom Scrollbar for dark theme (Original App Style) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.glass-panel {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.grid-background {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
